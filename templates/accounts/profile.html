@@ -1,0 +1,175 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-2">
+
+  <div class="row g-4">
+    
+    <!-- User Info Sidebar -->
+    <div class="col-lg-4">
+      <div class="card card-curlique p-4 bg-white shadow-sm mb-4">
+        <div class="text-center mb-3">
+          <div class="mx-auto rounded-circle bg-light d-flex align-items-center justify-content-center text-secondary mb-2" style="width: 80px; height: 80px;">
+            <i class="bi bi-person-fill fs-1"></i>
+          </div>
+          <h4 class="fw-bold text-dark mb-0">{{ profile.display_name }}</h4>
+          <span class="text-muted small">@{{ user.username }} &bull; {{ profile.city }}</span>
+        </div>
+
+        <div class="border-top pt-3 small d-flex flex-column gap-2 text-muted">
+          <div><i class="bi bi-envelope me-2"></i> {{ user.email }}</div>
+          <div><i class="bi bi-telephone me-2"></i> {{ profile.phone_number|default:"No phone added" }}</div>
+          <div><i class="bi bi-geo-alt me-2"></i> {{ profile.address_line|default:"No address set" }}</div>
+          {% if profile.bio %}
+            <div class="mt-2 p-2 bg-light rounded text-dark fst-italic">"{{ profile.bio }}"</div>
+          {% endif %}
+        </div>
+
+        <div class="mt-4">
+          <a href="{% url 'accounts:edit_profile' %}" class="btn btn-outline-dark btn-sm rounded-pill w-100">
+            <i class="bi bi-pencil me-1"></i> Edit Account Info
+          </a>
+        </div>
+      </div>
+
+      <!-- Quick Links Card -->
+      <div class="card card-curlique p-3 bg-white">
+        <h6 class="fw-bold small text-muted text-uppercase mb-2">My Curl Hub</h6>
+        <div class="list-group list-group-flush small">
+          <a href="{% url 'orders:order_history' %}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+            <span><i class="bi bi-box-seam me-2"></i> My Orders</span>
+            <i class="bi bi-chevron-right text-muted"></i>
+          </a>
+          <a href="{% url 'recommendations:routine_detail' %}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+            <span><i class="bi bi-journal-check me-2"></i> My Routine Guide</span>
+            <i class="bi bi-chevron-right text-muted"></i>
+          </a>
+          <a href="{% url 'recommendations:compatibility_checker' %}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+            <span><i class="bi bi-shield-check me-2"></i> Compatibility Checker</span>
+            <i class="bi bi-chevron-right text-muted"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Content: Active Hair Profile & Recent Orders -->
+    <div class="col-lg-8">
+      
+      <!-- Hair Profile Card -->
+      <div class="card card-curlique p-4 bg-white shadow-sm mb-4">
+        <div class="d-flex flex-wrap justify-content-between align-items-center mb-3">
+          <h4 class="fw-bold text-dark mb-0"><i class="bi bi-stars text-warning me-2"></i> My Saved Curl Profile</h4>
+          <a href="{% url 'quizzes:quiz' %}" class="btn btn-sm btn-outline-danger rounded-pill">
+            <i class="bi bi-arrow-repeat me-1"></i> Retake Quiz
+          </a>
+        </div>
+
+        {% if hair_profile %}
+          <div class="p-3 rounded-3 mb-3" style="background-color: #FFF9F6; border: 1px solid #F5DBD2;">
+            <div class="d-flex align-items-center gap-2 mb-1">
+              <span class="badge bg-danger fs-6">{{ hair_profile.curl_type }}</span>
+              <span class="fw-bold text-dark fs-5">{{ hair_profile.diagnosis_title }}</span>
+            </div>
+            <p class="small text-secondary mb-0">{{ hair_profile.diagnosis_summary }}</p>
+          </div>
+
+          <div class="row g-3 text-center mb-3">
+            <div class="col-6 col-md-3">
+              <div class="p-2 border rounded-3 bg-light">
+                <div class="small text-muted">Pattern</div>
+                <div class="fw-bold text-dark">{{ hair_profile.curl_type }}</div>
+              </div>
+            </div>
+            <div class="col-6 col-md-3">
+              <div class="p-2 border rounded-3 bg-light">
+                <div class="small text-muted">Porosity</div>
+                <div class="fw-bold text-capitalize text-dark">{{ hair_profile.porosity }}</div>
+              </div>
+            </div>
+            <div class="col-6 col-md-3">
+              <div class="p-2 border rounded-3 bg-light">
+                <div class="small text-muted">Density</div>
+                <div class="fw-bold text-capitalize text-dark">{{ hair_profile.density }}</div>
+              </div>
+            </div>
+            <div class="col-6 col-md-3">
+              <div class="p-2 border rounded-3 bg-light">
+                <div class="small text-muted">Scalp</div>
+                <div class="fw-bold text-capitalize text-dark">{{ hair_profile.scalp_type }}</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="d-flex gap-2">
+            <a href="{% url 'recommendations:routine_detail' %}" class="btn btn-curlique rounded-pill px-4">
+              <i class="bi bi-journal-text me-1"></i> View Step-by-Step Routine
+            </a>
+            <a href="{% url 'shop:product_list' %}?curl={{ hair_profile.curl_type }}&porosity={{ hair_profile.porosity }}" class="btn btn-outline-dark rounded-pill px-3">
+              Matched Catalogue &rarr;
+            </a>
+          </div>
+        {% else %}
+          <div class="text-center py-4 bg-light rounded-3">
+            <i class="bi bi-magic fs-1 text-danger d-block mb-2"></i>
+            <h6 class="fw-bold text-dark">You have not taken the Curl Profile Quiz yet</h6>
+            <p class="small text-muted mb-3">Take the 2-minute diagnostic to generate your rule-based routine.</p>
+            <a href="{% url 'quizzes:quiz' %}" class="btn btn-curlique rounded-pill px-4">Take Quiz Now</a>
+          </div>
+        {% endif %}
+      </div>
+
+      <!-- Recent Orders Card -->
+      <div class="card card-curlique p-4 bg-white shadow-sm">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h5 class="fw-bold text-dark mb-0"><i class="bi bi-receipt me-2"></i> Recent Orders</h5>
+          <a href="{% url 'orders:order_history' %}" class="small text-muted text-decoration-none">View All</a>
+        </div>
+
+        {% if recent_orders %}
+          <div class="table-responsive">
+            <table class="table table-hover align-middle small mb-0">
+              <thead class="table-light">
+                <tr>
+                  <th>Order #</th>
+                  <th>Date</th>
+                  <th>Total</th>
+                  <th>Payment</th>
+                  <th>Status</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for order in recent_orders %}
+                  <tr>
+                    <td class="fw-bold text-dark">{{ order.order_number }}</td>
+                    <td class="text-muted">{{ order.created_at|date:"M d, Y" }}</td>
+                    <td class="fw-semibold">NPR {{ order.total_amount|floatformat:0 }}</td>
+                    <td>
+                      {% if order.payment_status == 'PAID' %}
+                        <span class="badge bg-success">PAID</span>
+                      {% else %}
+                        <span class="badge bg-warning text-dark">{{ order.payment_method }}</span>
+                      {% endif %}
+                    </td>
+                    <td>
+                      <span class="badge bg-light text-dark border">{{ order.get_order_status_display }}</span>
+                    </td>
+                    <td>
+                      <a href="{% url 'orders:order_detail' order_number=order.order_number %}" class="btn btn-sm btn-outline-secondary rounded-pill py-0 px-2">View</a>
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% else %}
+          <p class="text-muted small mb-0">You have not placed any orders yet. Explore our <a href="{% url 'shop:product_list' %}">Nepal Catalogue</a>.</p>
+        {% endif %}
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+{% endblock %}

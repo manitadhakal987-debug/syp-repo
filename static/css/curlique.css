@@ -1,0 +1,260 @@
+/* ==========================================================================
+   CURLIQUE — Modern Curly-Hair Care Platform for Nepal
+   Custom CSS Enhancements for Bootstrap 5
+   ========================================================================== */
+
+:root {
+  --cq-terracotta: #9E4731;
+  --cq-terracotta-dark: #7A3523;
+  --cq-terracotta-light: #F4EBE7;
+  --cq-cream: #FAF7F2;
+  --cq-espresso: #251D1A;
+  --cq-amber: #D9822B;
+  --cq-sage: #4E6E58;
+  --cq-border: #E8DFD8;
+  --cq-card-bg: #FFFFFF;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  background-color: var(--cq-cream);
+  color: var(--cq-espresso);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+main {
+  flex: 1;
+}
+
+/* Brand Navbar */
+.navbar-curlique {
+  background-color: #FFFFFF;
+  border-bottom: 2px solid var(--cq-border);
+  box-shadow: 0 2px 12px rgba(37, 29, 26, 0.04);
+}
+
+.navbar-brand .brand-logo {
+  font-weight: 800;
+  font-size: 1.55rem;
+  letter-spacing: 1.5px;
+  color: var(--cq-terracotta);
+}
+
+.brand-badge {
+  font-size: 0.65rem;
+  letter-spacing: 0.8px;
+  background-color: var(--cq-terracotta-light);
+  color: var(--cq-terracotta);
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 12px;
+}
+
+/* Buttons */
+.btn-curlique {
+  background-color: var(--cq-terracotta);
+  color: #FFFFFF;
+  border: 1px solid var(--cq-terracotta);
+  font-weight: 600;
+  padding: 0.6rem 1.4rem;
+  border-radius: 8px;
+  transition: all 0.2s ease-in-out;
+}
+
+.btn-curlique:hover {
+  background-color: var(--cq-terracotta-dark);
+  border-color: var(--cq-terracotta-dark);
+  color: #FFFFFF;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(158, 71, 49, 0.25);
+}
+
+.btn-curlique-outline {
+  background-color: transparent;
+  color: var(--cq-terracotta);
+  border: 2px solid var(--cq-terracotta);
+  font-weight: 600;
+  padding: 0.55rem 1.3rem;
+  border-radius: 8px;
+  transition: all 0.2s ease-in-out;
+}
+
+.btn-curlique-outline:hover {
+  background-color: var(--cq-terracotta);
+  color: #FFFFFF;
+  transform: translateY(-1px);
+}
+
+/* Hero Section */
+.hero-banner {
+  background: linear-gradient(135deg, #FFF9F5 0%, #F5ECE5 100%);
+  border-radius: 20px;
+  padding: 3.5rem 2.5rem;
+  border: 1px solid var(--cq-border);
+  box-shadow: 0 10px 30px rgba(158, 71, 49, 0.06);
+}
+
+/* Cards */
+.card-curlique {
+  background: var(--cq-card-bg);
+  border: 1px solid var(--cq-border);
+  border-radius: 14px;
+  transition: all 0.25s ease-in-out;
+  box-shadow: 0 4px 16px rgba(37, 29, 26, 0.04);
+}
+
+.card-curlique:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(37, 29, 26, 0.09);
+  border-color: #D6C7BE;
+}
+
+/* Product Badges & Tags */
+.badge-curl {
+  background-color: #ECE5DE;
+  color: #4A3A33;
+  font-weight: 600;
+  font-size: 0.78rem;
+  padding: 0.35rem 0.65rem;
+  border-radius: 6px;
+}
+
+.badge-nepal {
+  background-color: #E8F5E9;
+  color: #2E7D32;
+  font-weight: 600;
+  font-size: 0.72rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.price-npr {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: var(--cq-terracotta);
+}
+
+/* Step Wizard for Quiz */
+.quiz-step-card {
+  display: none;
+}
+
+.quiz-step-card.active {
+  display: block;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.option-box {
+  border: 2px solid var(--cq-border);
+  border-radius: 12px;
+  padding: 1.2rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background-color: #FFFFFF;
+  height: 100%;
+}
+
+.option-box:hover {
+  border-color: var(--cq-terracotta);
+  background-color: #FFF9F7;
+}
+
+.btn-check:checked + .option-box,
+.btn-check:checked + label {
+  border-color: var(--cq-terracotta) !important;
+  background-color: var(--cq-terracotta-light) !important;
+  color: var(--cq-terracotta-dark) !important;
+  font-weight: 600;
+  box-shadow: 0 0 0 1px var(--cq-terracotta);
+}
+
+/* Routine Timeline */
+.routine-step-pill {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background-color: var(--cq-terracotta);
+  color: #FFFFFF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 1.1rem;
+}
+
+.routine-card {
+  border-left: 4px solid var(--cq-terracotta);
+  background: #FFFFFF;
+  border-radius: 0 12px 12px 0;
+  padding: 1.5rem;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+}
+
+/* Compatibility Meter */
+.compat-ring {
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 1.5rem;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+}
+
+.compat-ring.success {
+  background: #E8F5E9;
+  color: #2E7D32;
+  border: 4px solid #4CAF50;
+}
+
+.compat-ring.warning {
+  background: #FFF8E1;
+  color: #F57F17;
+  border: 4px solid #FFC107;
+}
+
+.compat-ring.danger {
+  background: #FFEBEE;
+  color: #C62828;
+  border: 4px solid #F44336;
+}
+
+/* Footer */
+footer {
+  background-color: #1F1715;
+  color: #DDD2CA;
+  border-top: 3px solid var(--cq-terracotta);
+}
+
+footer a {
+  color: #DDD2CA;
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+footer a:hover {
+  color: #FFFFFF;
+}
+
+/* eSewa Sandbox Branding */
+.esewa-badge {
+  background-color: #60BB46;
+  color: white;
+  font-weight: bold;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+}

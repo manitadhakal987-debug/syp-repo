@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-2">
+
+  <nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb small">
+      <li class="breadcrumb-item"><a href="{% url 'shop:home' %}" class="text-decoration-none">Home</a></li>
+      <li class="breadcrumb-item"><a href="{% url 'orders:order_history' %}" class="text-decoration-none">Orders</a></li>
+      <li class="breadcrumb-item active" aria-current="page">#{{ order.order_number }}</li>
+    </ol>
+  </nav>
+
+  <div class="max-w-700 mx-auto" style="max-width: 760px;">
+    
+    <div class="card card-curlique p-4 p-md-5 bg-white shadow-sm mb-4">
+      
+      <div class="d-flex flex-wrap justify-content-between align-items-center border-bottom pb-3 mb-4">
+        <div>
+          <span class="brand-logo fs-4">CURLIQUE</span>
+          <span class="brand-badge ms-1">NEPAL</span>
+          <h4 class="fw-bold text-dark mt-2 mb-0">Order #{{ order.order_number }}</h4>
+          <span class="small text-muted">Placed on {{ order.created_at|date:"F d, Y - h:i A" }}</span>
+        </div>
+        <div class="text-md-end mt-2 mt-md-0">
+          <span class="badge bg-info text-dark fs-6">{{ order.get_order_status_display }}</span>
+          <div class="small mt-1">
+            Payment: 
+            {% if order.payment_status == 'PAID' %}
+              <span class="badge bg-success">PAID</span>
+            {% else %}
+              <span class="badge bg-warning text-dark">{{ order.get_payment_method_display }}</span>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+      <!-- Customer & Shipping Information -->
+      <div class="row g-3 mb-4">
+        <div class="col-md-6">
+          <div class="p-3 bg-light rounded-3 small">
+            <strong class="text-dark d-block mb-1">Customer Details:</strong>
+            <div>{{ order.full_name }}</div>
+            <div>{{ order.email }}</div>
+            <div>Phone: <strong>{{ order.phone }}</strong></div>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <div class="p-3 bg-light rounded-3 small">
+            <strong class="text-dark d-block mb-1">Delivery Destination:</strong>
+            <div>{{ order.delivery_address }}</div>
+            <div>{{ order.city }}, Nepal</div>
+            {% if order.order_notes %}
+              <div class="mt-1 text-muted fst-italic">Note: {{ order.order_notes }}</div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+      <!-- Items Table -->
+      <h6 class="fw-bold text-dark text-uppercase small mb-3">Order Items</h6>
+      <div class="table-responsive mb-3">
+        <table class="table small align-middle mb-0">
+          <thead class="table-light">
+            <tr>
+              <th>Item</th>
+              <th class="text-center">Qty</th>
+              <th class="text-end">Unit Price</th>
+              <th class="text-end">Line Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for item in order.items.all %}
+              <tr>
+                <td>
+                  <span class="fw-semibold text-dark">{{ item.product_name }}</span>
+                  <div class="text-muted small">{{ item.product_brand }}</div>
+                </td>
+                <td class="text-center">{{ item.quantity }}</td>
+                <td class="text-end text-muted">NPR {{ item.price|floatformat:0 }}</td>
+                <td class="text-end fw-semibold">NPR {{ item.line_total|floatformat:0 }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+          <tfoot class="border-top">
+            <tr>
+              <td colspan="3" class="text-end text-muted">Subtotal:</td>
+              <td class="text-end">NPR {{ order.subtotal|floatformat:2 }}</td>
+            </tr>
+            <tr>
+              <td colspan="3" class="text-end text-muted">Nepal Delivery Fee:</td>
+              <td class="text-end">NPR {{ order.delivery_fee|floatformat:2 }}</td>
+            </tr>
+            <tr class="fw-bold fs-6">
+              <td colspan="3" class="text-end text-dark">Grand Total:</td>
+              <td class="text-end text-danger">NPR {{ order.total_amount|floatformat:2 }}</td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+
+      <div class="d-flex justify-content-between align-items-center pt-3 border-top">
+        <a href="{% url 'orders:order_history' %}" class="btn btn-outline-secondary rounded-pill btn-sm">
+          &larr; Back to Order History
+        </a>
+        <button onclick="window.print()" class="btn btn-outline-dark rounded-pill btn-sm">
+          <i class="bi bi-printer me-1"></i> Print Invoice
+        </button>
+      </div>
+
+    </div>
+
+  </div>
+</div>
+{% endblock %}

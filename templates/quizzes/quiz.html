@@ -1,0 +1,158 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-3">
+  <div class="max-w-800 mx-auto" style="max-width: 820px;">
+    
+    <!-- Wizard Header -->
+    <div class="text-center mb-4">
+      <span class="badge bg-danger text-uppercase px-3 py-2 mb-2">Interactive Hair Diagnostic</span>
+      <h2 class="fw-bold text-dark">Discover Your Unique Curl Profile</h2>
+      <p class="text-muted">6 progressive questions to unlock your custom rule-based routine and product matches in Nepal.</p>
+      
+      <!-- Progress Bar -->
+      <div class="progress mt-3" style="height: 10px; border-radius: 6px;">
+        <div id="quizProgressBar" class="progress-bar bg-danger progress-bar-striped progress-bar-animated" role="progressbar" style="width: 16%;" aria-valuenow="16" aria-valuemin="0" aria-valuemax="100"></div>
+      </div>
+      <div class="d-flex justify-content-between mt-1 text-muted small fw-semibold">
+        <span>Step <span id="currentStepNum">1</span> of 6</span>
+        <span>Science-Based &bull; No Guesswork</span>
+      </div>
+    </div>
+
+    <!-- Quiz Form -->
+    <form id="curlQuizForm" method="POST" action="{% url 'quizzes:quiz' %}">
+      {% csrf_token %}
+
+      <!-- STEP 1: Curl Pattern -->
+      <div class="quiz-step-card card card-curlique p-4 mb-4">
+        <h4 class="fw-bold text-dark mb-1"><i class="bi bi-water text-primary me-2"></i> Step 1: What is your primary curl pattern?</h4>
+        <p class="text-muted small mb-4">Look at your hair when it is naturally air-dried with no heat or brushing.</p>
+        
+        <div class="row g-3">
+          {% for val, label in form.curl_type.field.choices %}
+            <div class="col-md-4 col-sm-6">
+              <input type="radio" name="curl_type" value="{{ val }}" id="curl_{{ val }}" class="btn-check" {% if form.curl_type.value == val or forloop.first and not form.curl_type.value %}checked{% endif %}>
+              <label class="option-box d-flex flex-column text-start" for="curl_{{ val }}">
+                <span class="badge bg-secondary w-auto align-self-start mb-2">{{ val }}</span>
+                <span class="fw-bold text-dark">{{ label|slice:":3" }}</span>
+                <span class="small text-muted mt-1">{{ label|slice:"5:" }}</span>
+              </label>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- STEP 2: Porosity -->
+      <div class="quiz-step-card card card-curlique p-4 mb-4">
+        <h4 class="fw-bold text-dark mb-1"><i class="bi bi-droplet-half text-info me-2"></i> Step 2: What is your hair porosity?</h4>
+        <p class="text-muted small mb-3">
+          Porosity is how easily your hair absorbs and retains water. 
+          <em>Tip: In the shower, if water beads up and takes 5 minutes to get wet, it's Low Porosity. If it gets wet instantly but dries fast and gets frizzy, it's High Porosity.</em>
+        </p>
+        
+        <div class="row g-3">
+          {% for val, label in form.porosity.field.choices %}
+            <div class="col-md-4">
+              <input type="radio" name="porosity" value="{{ val }}" id="por_{{ val }}" class="btn-check" {% if form.porosity.value == val or forloop.first and not form.porosity.value %}checked{% endif %}>
+              <label class="option-box d-flex flex-column text-start" for="por_{{ val }}">
+                <span class="fw-bold text-capitalize fs-5 mb-1">{{ val }} Porosity</span>
+                <span class="small text-muted">{{ label }}</span>
+              </label>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- STEP 3: Density & Strand Thickness -->
+      <div class="quiz-step-card card card-curlique p-4 mb-4">
+        <h4 class="fw-bold text-dark mb-1"><i class="bi bi-rulers text-warning me-2"></i> Step 3: What is your individual strand thickness?</h4>
+        <p class="text-muted small mb-3">Roll a single hair strand between your thumb and index finger.</p>
+        
+        <div class="row g-3">
+          {% for val, label in form.density.field.choices %}
+            <div class="col-md-4">
+              <input type="radio" name="density" value="{{ val }}" id="den_{{ val }}" class="btn-check" {% if form.density.value == val or forloop.first and not form.density.value %}checked{% endif %}>
+              <label class="option-box d-flex flex-column text-start" for="den_{{ val }}">
+                <span class="fw-bold text-capitalize fs-5 mb-1">{{ val }} Strands</span>
+                <span class="small text-muted">{{ label }}</span>
+              </label>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- STEP 4: Scalp Type -->
+      <div class="quiz-step-card card card-curlique p-4 mb-4">
+        <h4 class="fw-bold text-dark mb-1"><i class="bi bi-heart-pulse text-danger me-2"></i> Step 4: How does your scalp feel?</h4>
+        <p class="text-muted small mb-3">Healthy curls start with a balanced scalp biome.</p>
+        
+        <div class="row g-3">
+          {% for val, label in form.scalp_type.field.choices %}
+            <div class="col-md-6">
+              <input type="radio" name="scalp_type" value="{{ val }}" id="scalp_{{ val }}" class="btn-check" {% if form.scalp_type.value == val or forloop.first and not form.scalp_type.value %}checked{% endif %}>
+              <label class="option-box d-flex flex-column text-start" for="scalp_{{ val }}">
+                <span class="fw-bold text-capitalize fs-5 mb-1">{{ val }} Scalp</span>
+                <span class="small text-muted">{{ label }}</span>
+              </label>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- STEP 5: Hair Concerns (Multi-Select) -->
+      <div class="quiz-step-card card card-curlique p-4 mb-4">
+        <h4 class="fw-bold text-dark mb-1"><i class="bi bi-exclamation-octagon text-danger me-2"></i> Step 5: What are your main hair concerns?</h4>
+        <p class="text-muted small mb-3">Select all that apply to your current hair condition:</p>
+        
+        <div class="row g-3">
+          {% for val, label in form.concerns.field.choices %}
+            <div class="col-md-6">
+              <div class="p-3 border rounded-3 bg-white h-100 d-flex align-items-center gap-3">
+                <input class="form-check-input fs-5 ms-1" type="checkbox" name="concerns" value="{{ val }}" id="concern_{{ val }}" {% if val in form.initial.concerns or val == 'frizz' or val == 'dryness' %}checked{% endif %}>
+                <label class="form-check-label small text-dark fw-semibold" for="concern_{{ val }}">
+                  {{ label }}
+                </label>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- STEP 6: Budget Tier in Nepal -->
+      <div class="quiz-step-card card card-curlique p-4 mb-4">
+        <h4 class="fw-bold text-dark mb-1"><i class="bi bi-cash-coin text-success me-2"></i> Step 6: What is your preferred budget in Nepal?</h4>
+        <p class="text-muted small mb-3">CURLIQUE prioritizes accessible, genuinely available products in Nepalese Rupees (NPR).</p>
+        
+        <div class="row g-3">
+          {% for val, label in form.budget.field.choices %}
+            <div class="col-md-4">
+              <input type="radio" name="budget" value="{{ val }}" id="budget_{{ val }}" class="btn-check" {% if form.budget.value == val or forloop.counter == 2 %}checked{% endif %}>
+              <label class="option-box d-flex flex-column text-start" for="budget_{{ val }}">
+                <span class="fw-bold text-capitalize fs-5 mb-1">{{ val }} Tier</span>
+                <span class="small text-muted">{{ label }}</span>
+              </label>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- Navigation Controls -->
+      <div class="d-flex justify-content-between align-items-center mt-4">
+        <button type="button" id="quizPrevBtn" class="btn btn-outline-secondary px-4 py-2" style="display: none;">
+          <i class="bi bi-arrow-left me-1"></i> Previous
+        </button>
+        <div class="ms-auto">
+          <button type="button" id="quizNextBtn" class="btn btn-curlique px-4 py-2">
+            Next Step <i class="bi bi-arrow-right ms-1"></i>
+          </button>
+          <button type="submit" id="quizSubmitBtn" class="btn btn-success px-4 py-2 shadow-sm" style="display: none;">
+            <i class="bi bi-stars me-1"></i> Generate My Rule-Based Diagnosis
+          </button>
+        </div>
+      </div>
+
+    </form>
+  </div>
+</div>
+{% endblock %}

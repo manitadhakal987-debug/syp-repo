@@ -1,0 +1,188 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-2">
+
+  <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+    <div>
+      <span class="badge bg-danger text-uppercase px-3 py-1 mb-2">Personalised Hair Blueprint</span>
+      <h1 class="fw-bold text-dark mb-1">Your Step-by-Step Curly Routine Guide</h1>
+      <p class="text-muted mb-0">Rule-based techniques customized for {{ profile.curl_type }} {{ profile.get_porosity_display|slice:":13" }} hair in Nepal.</p>
+    </div>
+    <div class="d-flex gap-2 mt-3 mt-md-0">
+      <a href="{% url 'quizzes:quiz' %}" class="btn btn-outline-secondary rounded-pill">Update Profile</a>
+      <a href="{% url 'recommendations:compatibility_checker' %}" class="btn btn-curlique rounded-pill"><i class="bi bi-shield-check me-1"></i> Check Products</a>
+    </div>
+  </div>
+
+  <!-- Diagnostic Summary Header -->
+  <div class="card card-curlique p-4 mb-5 bg-white">
+    <div class="row align-items-center g-3">
+      <div class="col-md-8">
+        <h4 class="fw-bold text-dark mb-1">{{ diagnosis.diagnosis_title }}</h4>
+        <p class="text-muted small mb-2">{{ diagnosis.mp_balance.headline }}</p>
+        <p class="text-secondary small mb-0">{{ diagnosis.mp_balance.advice }}</p>
+      </div>
+      <div class="col-md-4 text-md-end">
+        <div class="p-3 rounded-3 bg-light d-inline-block text-start">
+          <div class="small fw-bold text-dark mb-1"><i class="bi bi-calendar-check me-1"></i> Recommended Regimen:</div>
+          <div class="small text-muted">&bull; Deep Cleanse: 1-2x weekly</div>
+          <div class="small text-muted">&bull; Deep Conditioning: 1x weekly</div>
+          <div class="small text-muted">&bull; Daily Refresh: Water + Leave-in mist</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Detailed 5 Routine Phases -->
+  <div class="d-flex flex-column gap-4 mb-5">
+    {% for step in diagnosis.routine_steps %}
+      <div class="card card-curlique p-4">
+        <div class="row g-4">
+          <div class="col-lg-8">
+            <div class="d-flex align-items-center gap-3 mb-3">
+              <span class="routine-step-pill fs-5">{{ step.step_number }}</span>
+              <div>
+                <span class="badge bg-secondary text-uppercase small">{{ step.category }}</span>
+                <h4 class="fw-bold mb-0 text-dark">{{ step.title }}</h4>
+              </div>
+            </div>
+            
+            <p class="text-secondary mb-3">{{ step.instructions }}</p>
+
+            <div class="p-3 bg-light rounded-3 small">
+              <strong>Key Guidance:</strong>
+              <div class="text-muted mt-1">Frequency: <strong>{{ step.frequency }}</strong></div>
+              <div class="d-flex flex-wrap gap-1 mt-2">
+                {% for tag in step.tags %}
+                  <span class="badge bg-white text-dark border">{{ tag }}</span>
+                {% endfor %}
+              </div>
+            </div>
+          </div>
+
+          <!-- Suggested Catalogue Match for this Step -->
+          <div class="col-lg-4">
+            <div class="p-3 border rounded-3 bg-white h-100 d-flex flex-column justify-content-between">
+              <div>
+                <span class="badge bg-success text-uppercase small mb-2">Step Matching Products</span>
+                <h6 class="fw-bold text-dark mb-2">Available in Nepal</h6>
+                <p class="small text-muted">Tested CGM products in our catalogue that fit this step's exact formulation requirements:</p>
+              </div>
+
+              {% if step.category == 'Cleanse' %}
+                {% for p in step_products.cleanse %}
+                  <div class="border-top pt-2 mt-2 d-flex justify-content-between align-items-center small">
+                    <div>
+                      <div class="fw-semibold text-dark">{{ p.name|truncatewords:4 }}</div>
+                      <span class="text-muted">NPR {{ p.price|floatformat:0 }}</span>
+                    </div>
+                    <form action="{% url 'orders:add_to_cart' %}" method="POST" class="d-inline">
+                      {% csrf_token %}
+                      <input type="hidden" name="product_id" value="{{ p.id }}">
+                      <input type="hidden" name="quantity" value="1">
+                      <button type="submit" class="btn btn-sm btn-outline-success rounded-pill px-2 py-0"><i class="bi bi-cart-plus"></i></button>
+                    </form>
+                  </div>
+                {% endfor %}
+              {% elif step.category == 'Condition' %}
+                {% for p in step_products.condition %}
+                  <div class="border-top pt-2 mt-2 d-flex justify-content-between align-items-center small">
+                    <div>
+                      <div class="fw-semibold text-dark">{{ p.name|truncatewords:4 }}</div>
+                      <span class="text-muted">NPR {{ p.price|floatformat:0 }}</span>
+                    </div>
+                    <form action="{% url 'orders:add_to_cart' %}" method="POST" class="d-inline">
+                      {% csrf_token %}
+                      <input type="hidden" name="product_id" value="{{ p.id }}">
+                      <input type="hidden" name="quantity" value="1">
+                      <button type="submit" class="btn btn-sm btn-outline-success rounded-pill px-2 py-0"><i class="bi bi-cart-plus"></i></button>
+                    </form>
+                  </div>
+                {% endfor %}
+              {% elif step.category == 'Leave-In Foundation' %}
+                {% for p in step_products.leave_in %}
+                  <div class="border-top pt-2 mt-2 d-flex justify-content-between align-items-center small">
+                    <div>
+                      <div class="fw-semibold text-dark">{{ p.name|truncatewords:4 }}</div>
+                      <span class="text-muted">NPR {{ p.price|floatformat:0 }}</span>
+                    </div>
+                    <form action="{% url 'orders:add_to_cart' %}" method="POST" class="d-inline">
+                      {% csrf_token %}
+                      <input type="hidden" name="product_id" value="{{ p.id }}">
+                      <input type="hidden" name="quantity" value="1">
+                      <button type="submit" class="btn btn-sm btn-outline-success rounded-pill px-2 py-0"><i class="bi bi-cart-plus"></i></button>
+                    </form>
+                  </div>
+                {% endfor %}
+              {% elif step.category == 'Define & Hold' %}
+                {% for p in step_products.define %}
+                  <div class="border-top pt-2 mt-2 d-flex justify-content-between align-items-center small">
+                    <div>
+                      <div class="fw-semibold text-dark">{{ p.name|truncatewords:4 }}</div>
+                      <span class="text-muted">NPR {{ p.price|floatformat:0 }}</span>
+                    </div>
+                    <form action="{% url 'orders:add_to_cart' %}" method="POST" class="d-inline">
+                      {% csrf_token %}
+                      <input type="hidden" name="product_id" value="{{ p.id }}">
+                      <input type="hidden" name="quantity" value="1">
+                      <button type="submit" class="btn btn-sm btn-outline-success rounded-pill px-2 py-0"><i class="bi bi-cart-plus"></i></button>
+                    </form>
+                  </div>
+                {% endfor %}
+              {% else %}
+                {% for p in step_products.protect %}
+                  <div class="border-top pt-2 mt-2 d-flex justify-content-between align-items-center small">
+                    <div>
+                      <div class="fw-semibold text-dark">{{ p.name|truncatewords:4 }}</div>
+                      <span class="text-muted">NPR {{ p.price|floatformat:0 }}</span>
+                    </div>
+                    <form action="{% url 'orders:add_to_cart' %}" method="POST" class="d-inline">
+                      {% csrf_token %}
+                      <input type="hidden" name="product_id" value="{{ p.id }}">
+                      <input type="hidden" name="quantity" value="1">
+                      <button type="submit" class="btn btn-sm btn-outline-success rounded-pill px-2 py-0"><i class="bi bi-cart-plus"></i></button>
+                    </form>
+                  </div>
+                {% endfor %}
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+
+  <!-- Golden Dos & Don'ts Summary -->
+  <div class="row g-4 mb-5">
+    <div class="col-md-6">
+      <div class="card p-4 border-success bg-white shadow-sm rounded-4">
+        <h5 class="fw-bold text-success mb-3"><i class="bi bi-check2-circle me-2"></i> Wash Day Best Practices</h5>
+        <ul class="list-unstyled d-flex flex-column gap-2 small text-secondary mb-0">
+          {% for do in diagnosis.dos %}
+            <li class="d-flex align-items-start gap-2">
+              <i class="bi bi-check text-success fs-5"></i>
+              <span>{{ do }}</span>
+            </li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <div class="card p-4 border-danger bg-white shadow-sm rounded-4">
+        <h5 class="fw-bold text-danger mb-3"><i class="bi bi-slash-circle me-2"></i> Common Mistakes in Nepal</h5>
+        <ul class="list-unstyled d-flex flex-column gap-2 small text-secondary mb-0">
+          {% for dont in diagnosis.donts %}
+            <li class="d-flex align-items-start gap-2">
+              <i class="bi bi-x text-danger fs-5"></i>
+              <span>{{ dont }}</span>
+            </li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

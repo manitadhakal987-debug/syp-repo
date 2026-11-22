@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-2">
+
+  <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+    <div>
+      <h1 class="fw-bold text-dark mb-1">My Orders</h1>
+      <p class="text-muted mb-0">Track and view history of your curly-hair product purchases in Nepal.</p>
+    </div>
+    <a href="{% url 'shop:product_list' %}" class="btn btn-curlique rounded-pill btn-sm">Shop More Products</a>
+  </div>
+
+  {% if orders %}
+    <div class="card card-curlique p-4 bg-white shadow-sm">
+      <div class="table-responsive">
+        <table class="table table-hover align-middle">
+          <thead class="table-light small text-uppercase">
+            <tr>
+              <th>Order #</th>
+              <th>Placed Date</th>
+              <th>Destination</th>
+              <th>Payment</th>
+              <th>Status</th>
+              <th class="text-end">Total Amount</th>
+              <th class="text-end">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for order in orders %}
+              <tr>
+                <td class="fw-bold text-dark">{{ order.order_number }}</td>
+                <td class="text-muted small">{{ order.created_at|date:"M d, Y h:i A" }}</td>
+                <td class="small">{{ order.city }}</td>
+                <td>
+                  {% if order.payment_status == 'PAID' %}
+                    <span class="badge bg-success">PAID ({{ order.payment_method }})</span>
+                  {% else %}
+                    <span class="badge bg-warning text-dark">{{ order.payment_method }} (PENDING)</span>
+                  {% endif %}
+                </td>
+                <td>
+                  <span class="badge bg-info text-dark">{{ order.get_order_status_display }}</span>
+                </td>
+                <td class="text-end fw-bold text-dark">
+                  NPR {{ order.total_amount|floatformat:0 }}
+                </td>
+                <td class="text-end">
+                  <a href="{% url 'orders:order_detail' order_number=order.order_number %}" class="btn btn-sm btn-outline-dark rounded-pill px-3">
+                    Invoice
+                  </a>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  {% else %}
+    <div class="text-center py-5 bg-white rounded-4 border p-5 shadow-sm max-w-600 mx-auto" style="max-width: 600px;">
+      <i class="bi bi-receipt-cutoff fs-1 text-muted d-block mb-3"></i>
+      <h4 class="fw-bold text-dark">No Orders Placed Yet</h4>
+      <p class="text-muted small mb-4">When you purchase products through CURLIQUE, your invoices and tracking information will appear here.</p>
+      <a href="{% url 'shop:product_list' %}" class="btn btn-curlique rounded-pill px-4">Browse Catalogue</a>
+    </div>
+  {% endif %}
+
+</div>
+{% endblock %}

@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="max-w-600 mx-auto" style="max-width: 600px;">
+    
+    <div class="card card-curlique p-4 p-md-5 bg-white shadow-sm">
+      <div class="text-center mb-4">
+        <span class="brand-logo fs-3">CURLIQUE</span>
+        <h3 class="fw-bold text-dark mt-2">Create Your Curl Account</h3>
+        <p class="text-muted small">Save your personalized hair profile, track orders, and get tailored Nepal curl advice.</p>
+      </div>
+
+      <form method="POST" action="{% url 'accounts:register' %}">
+        {% csrf_token %}
+
+        {% if form.errors %}
+          <div class="alert alert-danger small p-2 mb-3">
+            Please correct the errors indicated below.
+          </div>
+        {% endif %}
+
+        <div class="row g-3 mb-3">
+          <div class="col-md-6">
+            <label class="form-label small fw-bold">First Name</label>
+            {{ form.first_name }}
+          </div>
+          <div class="col-md-6">
+            <label class="form-label small fw-bold">Last Name</label>
+            {{ form.last_name }}
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label small fw-bold">Username *</label>
+          {{ form.username }}
+          {% if form.username.errors %}<div class="text-danger small">{{ form.username.errors }}</div>{% endif %}
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label small fw-bold">Email Address *</label>
+          {{ form.email }}
+          {% if form.email.errors %}<div class="text-danger small">{{ form.email.errors }}</div>{% endif %}
+        </div>
+
+        <div class="row g-3 mb-3">
+          <div class="col-md-6">
+            <label class="form-label small fw-bold">City in Nepal</label>
+            {{ form.city }}
+          </div>
+          <div class="col-md-6">
+            <label class="form-label small fw-bold">Phone Number (98XXXXXXXX)</label>
+            {{ form.phone_number }}
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label small fw-bold">Street Address / Tole</label>
+          {{ form.address_line }}
+        </div>
+
+        <div class="row g-3 mb-4">
+          <div class="col-md-6">
+            <label class="form-label small fw-bold">Password *</label>
+            {{ form.password }}
+            {% if form.password.errors %}<div class="text-danger small">{{ form.password.errors }}</div>{% endif %}
+          </div>
+          <div class="col-md-6">
+            <label class="form-label small fw-bold">Confirm Password *</label>
+            {{ form.confirm_password }}
+            {% if form.confirm_password.errors %}<div class="text-danger small">{{ form.confirm_password.errors }}</div>{% endif %}
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-curlique w-100 rounded-pill py-2 fw-semibold">
+          Complete Registration
+        </button>
+      </form>
+
+      <div class="text-center mt-4 small text-muted">
+        Already have an account? <a href="{% url 'accounts:login' %}" class="fw-bold text-danger text-decoration-none">Sign In Here</a>
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

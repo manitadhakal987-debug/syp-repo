@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="max-w-500 mx-auto" style="max-width: 480px;">
+    
+    <div class="card card-curlique p-4 p-md-5 bg-white shadow-sm">
+      <div class="text-center mb-4">
+        <span class="brand-logo fs-3">CURLIQUE</span>
+        <h3 class="fw-bold text-dark mt-2">Welcome Back</h3>
+        <p class="text-muted small">Sign in to access your saved curl diagnosis, routines, and orders.</p>
+      </div>
+
+      <form method="POST" action="{% url 'accounts:login' %}">
+        {% csrf_token %}
+        
+        {% if form.errors %}
+          <div class="alert alert-danger small p-2 mb-3">
+            Invalid username or password. Please check and try again.
+          </div>
+        {% endif %}
+
+        <div class="mb-3">
+          <label class="form-label small fw-bold">Username</label>
+          {{ form.username }}
+        </div>
+
+        <div class="mb-4">
+          <label class="form-label small fw-bold">Password</label>
+          {{ form.password }}
+        </div>
+
+        <button type="submit" class="btn btn-curlique w-100 rounded-pill py-2 fw-semibold">
+          Sign In
+        </button>
+      </form>
+
+      <!-- Demo Accounts Box for College Viva -->
+      <div class="p-3 bg-light rounded-3 mt-4 border small text-muted">
+        <strong class="text-dark d-block mb-1"><i class="bi bi-info-circle me-1"></i> College Viva Demonstration Accounts:</strong>
+        <div>&bull; Admin User: <code>admin</code> &bull; Password: <code>Admin1234!</code></div>
+        <div>&bull; Test Customer: <code>aarav</code> &bull; Password: <code>CurlyPass123!</code></div>
+      </div>
+
+      <div class="text-center mt-4 small text-muted">
+        Don't have an account yet? <a href="{% url 'accounts:register' %}" class="fw-bold text-danger text-decoration-none">Create Free Account</a>
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

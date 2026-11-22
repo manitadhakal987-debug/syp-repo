@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-2">
+
+  <div class="text-center max-w-700 mx-auto mb-5" style="max-width: 750px;">
+    <span class="badge bg-danger text-uppercase px-3 py-1 mb-2">Haircut Style Guide</span>
+    <h1 class="fw-bold text-dark">Curly Haircuts &amp; Nepal Salon Advice</h1>
+    <p class="text-muted">
+      Most hair salons in Nepal are used to straight hair and commonly use thinning scissors, which ruin curl clumps. Learn the right haircut styles for your curl pattern and read the exact instructions to tell your stylist.
+    </p>
+  </div>
+
+  <div class="row g-4">
+    {% for guide in guides %}
+      <div class="col-lg-4 col-md-6">
+        <div class="card h-100 card-curlique overflow-hidden d-flex flex-column bg-white">
+          <div class="p-4 bg-light text-center border-bottom" style="min-height: 180px; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+            <i class="bi bi-scissors text-danger" style="font-size: 3.5rem;"></i>
+            <span class="badge bg-dark mt-2">{{ guide.suitable_curls }}</span>
+          </div>
+          
+          <div class="card-body p-4 d-flex flex-column">
+            <h4 class="fw-bold text-dark mb-2">{{ guide.name }}</h4>
+            <div class="small text-muted mb-2">
+              <i class="bi bi-person-bounding-box text-primary me-1"></i> Best for Face Shapes: <strong>{{ guide.face_shapes }}</strong>
+            </div>
+            <p class="small text-secondary mb-3 flex-grow-1">{{ guide.description|truncatewords:24 }}</p>
+
+            <div class="p-2 rounded bg-light border small text-muted mb-3">
+              <strong class="text-dark"><i class="bi bi-chat-quote-fill text-danger me-1"></i> Salon Tip:</strong>
+              {{ guide.nepal_salon_advice|truncatewords:15 }}
+            </div>
+
+            <a href="{% url 'shop:haircut_guide_detail' slug=guide.slug %}" class="btn btn-curlique rounded-pill w-100 mt-auto">
+              Read Salon Script &rarr;
+            </a>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+
+</div>
+{% endblock %}

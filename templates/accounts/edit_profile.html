@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-3">
+  <div class="max-w-600 mx-auto" style="max-width: 600px;">
+    
+    <div class="card card-curlique p-4 p-md-5 bg-white shadow-sm">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 class="fw-bold text-dark mb-0">Edit Profile</h3>
+        <a href="{% url 'accounts:profile' %}" class="small text-muted text-decoration-none">&larr; Back to Profile</a>
+      </div>
+
+      <form method="POST" action="{% url 'accounts:edit_profile' %}">
+        {% csrf_token %}
+
+        <div class="row g-3 mb-3">
+          <div class="col-md-6">
+            <label class="form-label small fw-bold">First Name</label>
+            {{ form.first_name }}
+          </div>
+          <div class="col-md-6">
+            <label class="form-label small fw-bold">Last Name</label>
+            {{ form.last_name }}
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label small fw-bold">Email Address</label>
+          {{ form.email }}
+        </div>
+
+        <div class="row g-3 mb-3">
+          <div class="col-md-6">
+            <label class="form-label small fw-bold">Phone Number (98XXXXXXXX)</label>
+            {{ form.phone_number }}
+          </div>
+          <div class="col-md-6">
+            <label class="form-label small fw-bold">City in Nepal</label>
+            {{ form.city }}
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label small fw-bold">Street Address / Tole</label>
+          {{ form.address_line }}
+        </div>
+
+        <div class="mb-4">
+          <label class="form-label small fw-bold">About Your Curls (Bio)</label>
+          {{ form.bio }}
+        </div>
+
+        <button type="submit" class="btn btn-curlique w-100 rounded-pill py-2 fw-semibold">
+          Save Changes
+        </button>
+      </form>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

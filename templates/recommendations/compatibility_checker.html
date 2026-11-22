@@ -1,0 +1,160 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-2">
+
+  <div class="text-center max-w-700 mx-auto mb-4" style="max-width: 750px;">
+    <span class="badge bg-primary text-uppercase px-3 py-1 mb-2">Catalogue Compatibility Engine</span>
+    <h1 class="fw-bold text-dark">Product Compatibility Checker</h1>
+    <p class="text-muted">
+      Select any product from our Nepal catalogue to test its scientific compatibility against your saved curl pattern, hair porosity, and scalp profile.
+    </p>
+  </div>
+
+  {% if not profile %}
+    <div class="alert alert-warning border shadow-sm p-4 text-center max-w-700 mx-auto mb-5 rounded-4" style="max-width: 750px;">
+      <i class="bi bi-person-x fs-1 text-warning d-block mb-2"></i>
+      <h5 class="fw-bold text-dark">No Hair Profile Detected</h5>
+      <p class="small text-muted mb-3">
+        To evaluate whether a product is compatible with your hair, our rule-based engine needs your curl pattern and porosity parameters.
+      </p>
+      <a href="{% url 'quizzes:quiz' %}" class="btn btn-curlique rounded-pill px-4">
+        <i class="bi bi-magic me-1"></i> Take Quick Curl Quiz (2 Mins)
+      </a>
+    </div>
+  {% else %}
+    <!-- Active User Profile Banner -->
+    <div class="card card-curlique p-3 mb-4 bg-white max-w-700 mx-auto" style="max-width: 800px;">
+      <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+        <div class="d-flex align-items-center gap-2">
+          <i class="bi bi-person-badge-fill text-danger fs-3"></i>
+          <div>
+            <div class="fw-bold text-dark">Testing Against Saved Profile:</div>
+            <div class="small text-muted">
+              Pattern: <span class="badge bg-danger">{{ profile.curl_type }} ({{ profile.curl_family }})</span> &bull; 
+              Porosity: <span class="badge bg-info text-dark">{{ profile.get_porosity_display|slice:":13" }}</span> &bull; 
+              Density: <span class="badge bg-secondary">{{ profile.get_density_display|slice:":14" }}</span>
+            </div>
+          </div>
+        </div>
+        <a href="{% url 'quizzes:quiz' %}" class="btn btn-sm btn-outline-secondary rounded-pill">Edit Profile</a>
+      </div>
+    </div>
+  {% endif %}
+
+  <!-- Product Selector Form -->
+  <div class="card card-curlique p-4 mb-5 max-w-700 mx-auto bg-white" style="max-width: 800px;">
+    <form method="GET" action="{% url 'recommendations:compatibility_checker' %}">
+      <label for="productSelect" class="form-label fw-bold text-dark mb-2">Select a Product from the Nepal Catalogue:</label>
+      <div class="input-group">
+        <select class="form-select form-select-lg" name="product_id" id="productSelect" required>
+          <option value="" disabled {% if not selected_product %}selected{% endif %}>-- Choose a product to evaluate --</option>
+          {% for p in products %}
+            <option value="{{ p.id }}" {% if selected_product and selected_product.id == p.id %}selected{% endif %}>
+              {{ p.brand }} — {{ p.name }} (NPR {{ p.price|floatformat:0 }})
+            </option>
+          {% endfor %}
+        </select>
+        <button class="btn btn-curlique px-4" type="submit">
+          <i class="bi bi-check2-circle me-1"></i> Analyze
+        </button>
+      </div>
+      <div class="form-text small mt-2">
+        <i class="bi bi-shield-check text-success me-1"></i> Only genuine catalogue products are analyzed. No unverified pasted ingredient lists.
+      </div>
+    </form>
+  </div>
+
+  <!-- Compatibility Analysis Result Card -->
+  {% if selected_product and compatibility_result %}
+    <div class="card card-curlique p-4 mb-5 max-w-700 mx-auto bg-white shadow-sm" style="max-width: 800px;">
+      <div class="row align-items-center g-4">
+        
+        <!-- Score Column -->
+        <div class="col-md-4 text-center border-end">
+          <div class="compat-ring {{ compatibility_result.badge_class }} mx-auto mb-3">
+            <span>{{ compatibility_result.score }}%</span>
+            <small style="font-size: 0.65rem; font-weight: 600; text-transform: uppercase;">Match</small>
+          </div>
+          <span class="badge bg-{{ compatibility_result.badge_class }} fs-6 px-3 py-2 text-uppercase">
+            {{ compatibility_result.verdict }}
+          </span>
+        </div>
+
+        <!-- Product Summary Column -->
+        <div class="col-md-8">
+          <span class="badge bg-secondary text-uppercase small mb-1">{{ selected_product.category.name }}</span>
+          <h4 class="fw-bold text-dark mb-1">{{ selected_product.brand }} — {{ selected_product.name }}</h4>
+          <div class="price-npr mb-2">NPR {{ selected_product.price|floatformat:0 }}</div>
+          <p class="small text-muted mb-3">{{ selected_product.short_description }}</p>
+          
+          <div class="d-flex flex-wrap gap-1 mb-3">
+            {% for tag in selected_product.suitability_tags.all %}
+              <span class="badge bg-light text-dark border small">{{ tag.name }}</span>
+            {% endfor %}
+          </div>
+
+          <form action="{% url 'orders:add_to_cart' %}" method="POST" class="d-inline">
+            {% csrf_token %}
+            <input type="hidden" name="product_id" value="{{ selected_product.id }}">
+            <input type="hidden" name="quantity" value="1">
+            <button type="submit" class="btn btn-curlique rounded-pill px-4">
+              <i class="bi bi-cart-plus me-1"></i> Add to Cart
+            </button>
+          </form>
+        </div>
+
+      </div>
+
+      <hr class="my-4">
+
+      <!-- Positives and Cautions Breakdowns -->
+      <div class="row g-4">
+        <div class="col-md-6">
+          <h6 class="fw-bold text-success mb-3"><i class="bi bi-check-circle-fill me-1"></i> Why This Matches Your Profile</h6>
+          {% if compatibility_result.positives %}
+            <ul class="list-unstyled d-flex flex-column gap-2 small text-secondary">
+              {% for item in compatibility_result.positives %}
+                <li class="d-flex align-items-start gap-2">
+                  <i class="bi bi-check2 text-success fs-5"></i>
+                  <span>{{ item }}</span>
+                </li>
+              {% endfor %}
+            </ul>
+          {% else %}
+            <p class="small text-muted">No specific positive synergies detected.</p>
+          {% endif %}
+        </div>
+
+        <div class="col-md-6">
+          <h6 class="fw-bold text-warning mb-3"><i class="bi bi-exclamation-triangle-fill me-1"></i> Cautions &amp; Considerations</h6>
+          {% if compatibility_result.cautions %}
+            <ul class="list-unstyled d-flex flex-column gap-2 small text-secondary">
+              {% for item in compatibility_result.cautions %}
+                <li class="d-flex align-items-start gap-2">
+                  <i class="bi bi-exclamation-circle text-warning fs-5"></i>
+                  <span>{{ item }}</span>
+                </li>
+              {% endfor %}
+            </ul>
+          {% else %}
+            <div class="p-3 bg-light rounded-3 text-success small">
+              <i class="bi bi-check-all me-1"></i> Zero cautions found. Perfectly safe for your curl pattern and porosity!
+            </div>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Ingredient Transparency Box -->
+      <div class="mt-4 pt-3 border-top">
+        <h6 class="fw-bold text-dark small text-uppercase mb-2"><i class="bi bi-list-check me-1"></i> Full Ingredient Declaration</h6>
+        <div class="p-3 bg-light rounded-3 small text-muted font-monospace" style="font-size: 0.8rem; line-height: 1.4;">
+          {{ selected_product.ingredients_list }}
+        </div>
+      </div>
+
+    </div>
+  {% endif %}
+
+</div>
+{% endblock %}

@@ -1,0 +1,152 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-2">
+
+  <h1 class="fw-bold text-dark mb-4">Checkout &amp; Nepal Delivery</h1>
+
+  <form method="POST" action="{% url 'orders:checkout' %}">
+    {% csrf_token %}
+
+    <div class="row g-4">
+      
+      <!-- Left Column: Customer and Shipping Information -->
+      <div class="col-lg-7">
+        
+        <!-- Customer Details -->
+        <div class="card card-curlique p-4 bg-white shadow-sm mb-4">
+          <h5 class="fw-bold text-dark mb-3"><i class="bi bi-person me-2"></i> 1. Contact Information</h5>
+          
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label small fw-bold">Full Name *</label>
+              {{ form.full_name }}
+              {% if form.full_name.errors %}<div class="text-danger small">{{ form.full_name.errors }}</div>{% endif %}
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label small fw-bold">Email Address *</label>
+              {{ form.email }}
+              {% if form.email.errors %}<div class="text-danger small">{{ form.email.errors }}</div>{% endif %}
+            </div>
+
+            <div class="col-md-12">
+              <label class="form-label small fw-bold">Mobile Phone Number (Nepal) *</label>
+              {{ form.phone }}
+              <div class="form-text small">Our delivery rider will call this number before arrival.</div>
+              {% if form.phone.errors %}<div class="text-danger small">{{ form.phone.errors }}</div>{% endif %}
+            </div>
+          </div>
+        </div>
+
+        <!-- Delivery Address -->
+        <div class="card card-curlique p-4 bg-white shadow-sm mb-4">
+          <h5 class="fw-bold text-dark mb-3"><i class="bi bi-geo-alt me-2"></i> 2. Delivery Destination</h5>
+          
+          <div class="mb-3">
+            <label class="form-label small fw-bold">Delivery Location / City in Nepal *</label>
+            {{ form.city }}
+            {% if form.city.errors %}<div class="text-danger small">{{ form.city.errors }}</div>{% endif %}
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label small fw-bold">Specific Street Address / Tole / Landmark *</label>
+            {{ form.delivery_address }}
+            {% if form.delivery_address.errors %}<div class="text-danger small">{{ form.delivery_address.errors }}</div>{% endif %}
+          </div>
+
+          <div class="mb-0">
+            <label class="form-label small fw-bold">Delivery Instructions / Gate Landmark (Optional)</label>
+            {{ form.order_notes }}
+          </div>
+        </div>
+
+        <!-- Payment Method Selection -->
+        <div class="card card-curlique p-4 bg-white shadow-sm mb-4">
+          <h5 class="fw-bold text-dark mb-3"><i class="bi bi-credit-card me-2"></i> 3. Payment Method in Nepal</h5>
+          
+          <div class="d-flex flex-column gap-3">
+            <!-- Option 1: Cash on Delivery -->
+            <div>
+              <input type="radio" name="payment_method" value="COD" id="pay_cod" class="btn-check" checked>
+              <label class="option-box d-flex align-items-center justify-content-between p-3" for="pay_cod">
+                <div class="d-flex align-items-center gap-3">
+                  <i class="bi bi-cash-stack fs-2 text-success"></i>
+                  <div>
+                    <span class="fw-bold text-dark d-block">Cash on Delivery (COD)</span>
+                    <small class="text-muted">Pay in cash or mobile scan when the delivery rider arrives at your doorstep.</small>
+                  </div>
+                </div>
+                <span class="badge bg-success">Popular in Nepal</span>
+              </label>
+            </div>
+
+            <!-- Option 2: eSewa Sandbox Test -->
+            <div>
+              <input type="radio" name="payment_method" value="ESEWA" id="pay_esewa" class="btn-check">
+              <label class="option-box d-flex align-items-center justify-content-between p-3" for="pay_esewa">
+                <div class="d-flex align-items-center gap-3">
+                  <i class="bi bi-wallet2 fs-2 text-success"></i>
+                  <div>
+                    <span class="fw-bold text-dark d-block">eSewa Sandbox (Online Test Payment)</span>
+                    <small class="text-muted">Simulated test payment using eSewa Sandbox v2 gateway with HMAC-SHA256 signature.</small>
+                  </div>
+                </div>
+                <span class="esewa-badge">Test Mode</span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Right Column: Order Items & Live Calculation -->
+      <div class="col-lg-5">
+        <div class="card card-curlique p-4 bg-white shadow-sm sticky-top" style="top: 80px;">
+          <h5 class="fw-bold text-dark mb-3">Order Items ({{ cart.total_items }})</h5>
+          
+          <div class="d-flex flex-column gap-2 mb-3 max-h-300 overflow-auto">
+            {% for item in cart.items.all %}
+              <div class="d-flex justify-content-between align-items-center small border-bottom pb-2">
+                <div>
+                  <div class="fw-semibold text-dark">{{ item.quantity }}x {{ item.product.name }}</div>
+                  <span class="text-muted">{{ item.product.brand }}</span>
+                </div>
+                <span class="fw-bold text-dark">NPR {{ item.line_total|floatformat:0 }}</span>
+              </div>
+            {% endfor %}
+          </div>
+
+          <!-- Hidden input for subtotal to enable dynamic JS calculation -->
+          <input type="hidden" id="orderSubtotalVal" value="{{ subtotal }}">
+
+          <div class="d-flex justify-content-between text-muted small mb-2">
+            <span>Subtotal:</span>
+            <span class="fw-semibold text-dark">NPR {{ subtotal|floatformat:2 }}</span>
+          </div>
+
+          <div class="d-flex justify-content-between text-muted small mb-3">
+            <span>Nepal Delivery Fee:</span>
+            <span id="deliveryFeeDisplay" class="fw-semibold text-dark">NPR 100.00</span>
+          </div>
+
+          <div class="border-top pt-3 mb-4 d-flex justify-content-between align-items-center">
+            <span class="fs-5 fw-bold text-dark">Total Amount:</span>
+            <span id="totalAmountDisplay" class="price-npr fs-3">NPR {{ subtotal|add:"100"|floatformat:2 }}</span>
+          </div>
+
+          <button type="submit" class="btn btn-curlique w-100 rounded-pill py-3 fw-bold fs-5 shadow-sm">
+            Place Order Now
+          </button>
+
+          <p class="small text-muted text-center mt-3 mb-0">
+            <i class="bi bi-shield-lock-fill text-success me-1"></i> Secure checkout with Django CSRF &amp; data validation.
+          </p>
+        </div>
+      </div>
+
+    </div>
+  </form>
+
+</div>
+{% endblock %}

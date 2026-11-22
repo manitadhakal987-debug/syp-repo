@@ -1,0 +1,235 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+
+  <!-- Active Profile Notice if User has completed Quiz -->
+  {% if user_profile %}
+    <div class="alert alert-light border border-warning shadow-sm mb-4 d-flex flex-wrap align-items-center justify-content-between p-3" style="background-color: #FFFDF9;">
+      <div class="d-flex align-items-center gap-3">
+        <div class="fs-2 text-warning"><i class="bi bi-stars"></i></div>
+        <div>
+          <h6 class="mb-0 fw-bold">Active Curl Profile: <span class="badge bg-danger">{{ user_profile.curl_type }}</span> &bull; {{ user_profile.get_porosity_display|slice:":13" }} Porosity</h6>
+          <small class="text-muted">Your customized diagnosis: "{{ user_profile.diagnosis_summary|default:'Rule-based routine ready' }}"</small>
+        </div>
+      </div>
+      <div class="d-flex gap-2 mt-2 mt-md-0">
+        <a href="{% url 'recommendations:routine_detail' %}" class="btn btn-sm btn-curlique"><i class="bi bi-journal-text me-1"></i> View My Routine</a>
+        <a href="{% url 'quizzes:quiz' %}" class="btn btn-sm btn-outline-secondary">Retake Quiz</a>
+      </div>
+    </div>
+  {% endif %}
+
+  <!-- Hero Section -->
+  <section class="hero-banner mb-5">
+    <div class="row align-items-center g-4">
+      <div class="col-lg-7">
+        <span class="badge bg-danger text-uppercase px-3 py-2 mb-3 fw-semibold">🇳🇵 First Curly-Hair Care System for Nepal</span>
+        <h1 class="display-4 fw-bold text-dark lh-sm mb-3">
+          Understand Your Curls. Choose Products That Actually Work in Nepal.
+        </h1>
+        <p class="lead text-secondary mb-4">
+          No more guessing or wasting money on unsuitable hair products. CURLIQUE uses <strong>transparent, rule-based science</strong> to diagnose your curl pattern, porosity, and scalp needs, recommending authentic, affordable products available locally in Nepal.
+        </p>
+        <div class="d-flex flex-wrap gap-3">
+          <a href="{% url 'quizzes:quiz' %}" class="btn btn-curlique btn-lg px-4 shadow-sm">
+            <i class="bi bi-magic me-2"></i> Take Free Curl Quiz
+          </a>
+          <a href="{% url 'shop:product_list' %}" class="btn btn-curlique-outline btn-lg px-4">
+            <i class="bi bi-grid-3x3-gap me-2"></i> Browse Nepal Catalogue
+          </a>
+        </div>
+        <div class="mt-4 pt-2 d-flex flex-wrap gap-4 text-muted small">
+          <div><i class="bi bi-shield-check text-success me-1"></i> 100% Rule-Based (No Paid Ads)</div>
+          <div><i class="bi bi-truck text-primary me-1"></i> Cash on Delivery in Nepal</div>
+          <div><i class="bi bi-wallet2 text-success me-1"></i> eSewa Sandbox Verified</div>
+        </div>
+      </div>
+
+      <div class="col-lg-5 text-center">
+        <div class="p-4 bg-white rounded-4 shadow-sm border border-light">
+          <div class="d-flex justify-content-around text-center mb-4">
+            <div class="p-3 rounded-3" style="background-color: #FFF3EB;">
+              <div class="fs-1 fw-bold text-danger">2A–2C</div>
+              <span class="small fw-semibold text-muted">Wavy Patterns</span>
+            </div>
+            <div class="p-3 rounded-3" style="background-color: #F0F7F2;">
+              <div class="fs-1 fw-bold text-success">3A–3C</div>
+              <span class="small fw-semibold text-muted">Curly Ringlets</span>
+            </div>
+            <div class="p-3 rounded-3" style="background-color: #F5F0FB;">
+              <div class="fs-1 fw-bold text-primary">4A–4C</div>
+              <span class="small fw-semibold text-muted">Coily Textures</span>
+            </div>
+          </div>
+          <p class="small text-muted mb-0">
+            "Before CURLIQUE, I spent thousands on heavy butters that made my fine 2B waves limp. The rule-based diagnosis showed me lightweight humectants instead!"
+          </p>
+          <div class="fw-bold small text-dark mt-2">— Sneha S., Lalitpur</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- How It Works (3 Steps) -->
+  <section class="mb-5">
+    <div class="text-center max-w-700 mx-auto mb-4">
+      <h2 class="fw-bold text-dark">How CURLIQUE Works</h2>
+      <p class="text-muted">A clear, transparent 3-step pathway designed specifically for Nepalese hair conditions</p>
+    </div>
+
+    <div class="row g-4 text-center">
+      <div class="col-md-4">
+        <div class="card h-100 card-curlique p-4">
+          <div class="routine-step-pill mx-auto mb-3">1</div>
+          <h5 class="fw-bold">1. Take the Curl Quiz</h5>
+          <p class="text-muted small">
+            Answer progressive questions about your curl tightness (2A-4C), strand porosity (water absorption), density, and scalp type.
+          </p>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="card h-100 card-curlique p-4">
+          <div class="routine-step-pill mx-auto mb-3">2</div>
+          <h5 class="fw-bold">2. Rule-Based Diagnosis</h5>
+          <p class="text-muted small">
+            Our Python rule engine calculates your exact Moisture vs Protein balance, wash frequency, and 5-step CGM daily routine.
+          </p>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="card h-100 card-curlique p-4">
+          <div class="routine-step-pill mx-auto mb-3">3</div>
+          <h5 class="fw-bold">3. Product Match &amp; Delivery</h5>
+          <p class="text-muted small">
+            Check compatibility of any catalogue product, order with Cash on Delivery or test eSewa sandbox, and receive express delivery.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Featured Products in Nepal Catalogue -->
+  <section class="mb-5">
+    <div class="d-flex justify-content-between align-items-end mb-4">
+      <div>
+        <h2 class="fw-bold text-dark mb-1">Featured Curly Products</h2>
+        <p class="text-muted mb-0">Tested &amp; authentic products available for delivery in Nepal (Prices in NPR)</p>
+      </div>
+      <a href="{% url 'shop:product_list' %}" class="btn btn-outline-dark rounded-pill">View All Catalogue &rarr;</a>
+    </div>
+
+    <div class="row g-4">
+      {% for product in featured_products %}
+        <div class="col-lg-3 col-md-6">
+          <div class="card h-100 card-curlique overflow-hidden d-flex flex-column">
+            <div class="position-relative bg-light text-center p-3" style="min-height: 200px; display: flex; align-items: center; justify-content: center;">
+              <i class="bi bi-bag-heart text-secondary" style="font-size: 4rem;"></i>
+              <span class="position-absolute top-0 end-0 m-2 badge bg-success">{{ product.category.name }}</span>
+            </div>
+            
+            <div class="card-body p-3 d-flex flex-column">
+              <span class="small text-muted fw-bold text-uppercase">{{ product.brand }}</span>
+              <h6 class="fw-bold mb-1">
+                <a href="{% url 'shop:product_detail' slug=product.slug %}" class="text-dark text-decoration-none">{{ product.name }}</a>
+              </h6>
+              <p class="small text-muted mb-2 flex-grow-1">{{ product.short_description|truncatewords:14 }}</p>
+              
+              <div class="mb-2">
+                <span class="badge-nepal"><i class="bi bi-geo-alt-fill"></i> Nepal Stock</span>
+                {% if product.stock > 0 %}
+                  <span class="badge bg-light text-dark border">In Stock ({{ product.stock }})</span>
+                {% else %}
+                  <span class="badge bg-danger">Out of Stock</span>
+                {% endif %}
+              </div>
+
+              <div class="d-flex align-items-center justify-content-between mt-auto pt-2 border-top">
+                <span class="price-npr">NPR {{ product.price|floatformat:0 }}</span>
+                <form action="{% url 'orders:add_to_cart' %}" method="POST" class="d-inline">
+                  {% csrf_token %}
+                  <input type="hidden" name="product_id" value="{{ product.id }}">
+                  <input type="hidden" name="quantity" value="1">
+                  <button type="submit" class="btn btn-sm btn-curlique rounded-pill px-3">
+                    <i class="bi bi-cart-plus me-1"></i> Add
+                  </button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </section>
+
+  <!-- Haircut Style Guide & Compatibility Feature Highlights -->
+  <section class="row g-4 mb-5">
+    <!-- Box 1: Product Compatibility Checker -->
+    <div class="col-md-6">
+      <div class="p-4 rounded-4 bg-white border border-light shadow-sm h-100">
+        <div class="badge bg-primary text-uppercase mb-2">Exclusive Feature</div>
+        <h3 class="fw-bold text-dark">Product Compatibility Checker</h3>
+        <p class="text-muted small">
+          Have you ever picked a product in a store and wondered if it will ruin your curl pattern? Select any product in our catalogue and see instant rule-based match scores, ingredient benefits, and cautions.
+        </p>
+        <a href="{% url 'recommendations:compatibility_checker' %}" class="btn btn-outline-primary rounded-pill">
+          <i class="bi bi-search me-1"></i> Check Product Compatibility
+        </a>
+      </div>
+    </div>
+
+    <!-- Box 2: Haircut Style Guide for Nepal Salons -->
+    <div class="col-md-6">
+      <div class="p-4 rounded-4 bg-white border border-light shadow-sm h-100">
+        <div class="badge bg-danger text-uppercase mb-2">Nepal Salon Guide</div>
+        <h3 class="fw-bold text-dark">Curly Haircut Guide &amp; Salon Script</h3>
+        <p class="text-muted small">
+          Most barbers and salons in Kathmandu are trained strictly for straight hair and reach for thinning scissors. Read our guide on DevaCuts, Rezo Cuts, and get the exact script to tell your stylist.
+        </p>
+        <a href="{% url 'shop:haircut_guides' %}" class="btn btn-outline-danger rounded-pill">
+          <i class="bi bi-scissors me-1"></i> Read Nepal Haircut Guide
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Nepal Climate & Curl Care Tips -->
+  <section class="p-4 rounded-4 bg-white border mb-5 shadow-sm">
+    <div class="row align-items-center g-4">
+      <div class="col-lg-8">
+        <h4 class="fw-bold text-dark"><i class="bi bi-cloud-sun text-warning me-2"></i> Managing Curls in Nepal's Changing Seasons</h4>
+        <div class="row g-3 mt-1">
+          <div class="col-md-6">
+            <div class="p-3 rounded-3 bg-light">
+              <h6 class="fw-bold text-danger"><i class="bi bi-cloud-rain me-1"></i> Monsoon &amp; Summer Humidity</h6>
+              <p class="small text-muted mb-0">
+                Excess atmospheric moisture causes curl strands to swell and frizz. Use strong-hold botanical flaxseed gels and seal the cast with a lightweight oil (Argan or Jojoba).
+              </p>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="p-3 rounded-3 bg-light">
+              <h6 class="fw-bold text-primary"><i class="bi bi-snow me-1"></i> Winter Dryness &amp; Dust</h6>
+              <p class="small text-muted mb-0">
+                Cold, dry Kathmandu valley air siphons moisture from cuticles. Switch to deep conditioning masks weekly and sleep in a satin bonnet to prevent friction breakage.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-4 text-center">
+        <div class="p-3 rounded-3 border border-success bg-white">
+          <i class="bi bi-award text-success fs-1"></i>
+          <h6 class="fw-bold mt-2">Computing SYP Standard</h6>
+          <p class="small text-muted mb-0">
+            Complies with the approved college proposal: Pure Django backend, rule-based logic, SQLite database, and eSewa test sandbox.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
+{% endblock %}

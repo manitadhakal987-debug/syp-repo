@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="max-w-600 mx-auto" style="max-width: 620px;">
+    
+    <div class="card card-curlique p-4 p-md-5 bg-white shadow-sm text-center">
+      
+      <!-- eSewa Sandbox Header -->
+      <div class="mb-4">
+        <span class="esewa-badge fs-6 px-3 py-1 mb-2 d-inline-block">eSewa epay Sandbox v2</span>
+        <h3 class="fw-bold text-dark mt-2">Complete Test Payment</h3>
+        <p class="text-muted small">You are about to initiate an eSewa test transaction for Order <strong>#{{ order.order_number }}</strong>.</p>
+      </div>
+
+      <!-- Payment Breakdown Box -->
+      <div class="p-3 bg-light rounded-3 text-start small mb-4 border">
+        <div class="d-flex justify-content-between mb-1">
+          <span class="text-muted">Customer Name:</span>
+          <span class="fw-semibold text-dark">{{ order.full_name }}</span>
+        </div>
+        <div class="d-flex justify-content-between mb-1">
+          <span class="text-muted">Order Subtotal:</span>
+          <span>NPR {{ order.subtotal|floatformat:2 }}</span>
+        </div>
+        <div class="d-flex justify-content-between mb-2">
+          <span class="text-muted">Delivery Fee ({{ order.city }}):</span>
+          <span>NPR {{ order.delivery_fee|floatformat:2 }}</span>
+        </div>
+        <div class="border-top pt-2 d-flex justify-content-between fs-5 fw-bold text-dark">
+          <span>Total Payable:</span>
+          <span class="text-success">NPR {{ order.total_amount|floatformat:2 }}</span>
+        </div>
+      </div>
+
+      <!-- Official eSewa Sandbox Gateway Form -->
+      <form action="{{ esewa_params.action_url }}" method="POST" id="esewaForm">
+        <input type="hidden" name="amount" value="{{ esewa_params.amount }}">
+        <input type="hidden" name="tax_amount" value="{{ esewa_params.tax_amount }}">
+        <input type="hidden" name="product_service_charge" value="{{ esewa_params.product_service_charge }}">
+        <input type="hidden" name="product_delivery_charge" value="{{ esewa_params.product_delivery_charge }}">
+        <input type="hidden" name="total_amount" value="{{ esewa_params.total_amount }}">
+        <input type="hidden" name="transaction_uuid" value="{{ esewa_params.transaction_uuid }}">
+        <input type="hidden" name="product_code" value="{{ esewa_params.product_code }}">
+        <input type="hidden" name="success_url" value="{{ esewa_params.success_url }}">
+        <input type="hidden" name="failure_url" value="{{ esewa_params.failure_url }}">
+        <input type="hidden" name="signed_field_names" value="{{ esewa_params.signed_field_names }}">
+        <input type="hidden" name="signature" value="{{ esewa_params.signature }}">
+
+        <button type="submit" class="btn btn-success btn-lg w-100 rounded-pill py-3 fw-bold shadow-sm mb-3" style="background-color: #60BB46; border-color: #60BB46;">
+          <i class="bi bi-wallet2 me-2"></i> Pay with eSewa Sandbox Gateway
+        </button>
+      </form>
+
+      <!-- Academic Viva / Offline Sandbox Simulator -->
+      <div class="p-3 bg-white border border-success rounded-3 text-start small mb-3">
+        <div class="fw-bold text-success mb-1">
+          <i class="bi bi-mortarboard-fill me-1"></i> College Viva Sandbox Demonstration:
+        </div>
+        <p class="text-muted mb-2" style="font-size: 0.8rem;">
+          If your examination hall network restricts external eSewa test domains, click below to test the verification pipeline. It passes the signed response through our Django HMAC-SHA256 verification engine:
+        </p>
+
+        <!-- Simulated Response Generation Script -->
+        <a href="{% url 'orders:esewa_success' %}?data={{ esewa_params.simulation_data }}" id="simulateSuccessBtn" class="btn btn-outline-success btn-sm w-100 rounded-pill">
+          <i class="bi bi-check2-circle me-1"></i> Instant Test Verification (HMAC Signed)
+        </a>
+      </div>
+
+      <div class="text-center">
+        <a href="{% url 'orders:esewa_failure' %}" class="small text-danger text-decoration-none">
+          Cancel Payment and Return
+        </a>
+      </div>
+
+    </div>
+
+  </div>
+</div>
+
+<script>
+  // Encode simulation payload for offline testing
+  document.addEventListener('DOMContentLoaded', function() {
+    const totalAmount = "{{ esewa_params.total_amount }}";
+    const txUuid = "{{ esewa_params.transaction_uuid }}";
+    const prodCode = "{{ esewa_params.product_code }}";
+    const sig = "{{ esewa_params.signature }}";
+
+    const payloadObj = {
+      "transaction_code": "ESEWA-TEST-REF-" + Math.floor(Math.random() * 899999 + 100000),
+      "status": "COMPLETE",
+      "total_amount": totalAmount,
+      "transaction_uuid": txUuid,
+      "product_code": prodCode,
+      "signed_field_names": "total_amount,transaction_uuid,product_code",
+      "signature": sig
+    };
+
+    const b64 = btoa(JSON.stringify(payloadObj));
+    const simBtn = document.getElementById('simulateSuccessBtn');
+    if (simBtn) {
+      simBtn.href = "{% url 'orders:esewa_success' %}?data=" + encodeURIComponent(b64);
+    }
+  });
+</script>
+{% endblock %}

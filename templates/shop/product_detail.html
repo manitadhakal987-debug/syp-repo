@@ -1,0 +1,189 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-2">
+
+  <!-- Breadcrumbs -->
+  <nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb small">
+      <li class="breadcrumb-item"><a href="{% url 'shop:home' %}" class="text-decoration-none">Home</a></li>
+      <li class="breadcrumb-item"><a href="{% url 'shop:product_list' %}" class="text-decoration-none">Catalogue</a></li>
+      <li class="breadcrumb-item"><a href="{% url 'shop:product_list' %}?category={{ product.category.slug }}" class="text-decoration-none">{{ product.category.name }}</a></li>
+      <li class="breadcrumb-item active" aria-current="page">{{ product.name }}</li>
+    </ol>
+  </nav>
+
+  <div class="row g-5 mb-5">
+    
+    <!-- Left Column: Product Visuals & Stock Info -->
+    <div class="col-lg-5">
+      <div class="card card-curlique p-4 bg-white text-center shadow-sm">
+        <div class="p-5 bg-light rounded-4 mb-3 d-flex align-items-center justify-content-center" style="min-height: 320px;">
+          <i class="bi bi-droplet-half text-secondary" style="font-size: 6rem;"></i>
+        </div>
+        <div class="d-flex justify-content-around text-muted small border-top pt-3">
+          <div><i class="bi bi-shield-check text-success me-1"></i> 100% Authentic</div>
+          <div><i class="bi bi-geo-alt text-primary me-1"></i> Nepal Stock</div>
+          <div><i class="bi bi-box-seam text-warning me-1"></i> {{ product.size|default:"Standard Size" }}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Column: Product Details & Add to Cart -->
+    <div class="col-lg-7">
+      <div class="d-flex align-items-center gap-2 mb-2">
+        <span class="badge bg-secondary text-uppercase">{{ product.brand }}</span>
+        <span class="badge bg-success">{{ product.category.name }}</span>
+      </div>
+
+      <h1 class="fw-bold text-dark mb-2">{{ product.name }}</h1>
+      <div class="price-npr fs-2 mb-3">NPR {{ product.price|floatformat:0 }}</div>
+      
+      <p class="text-secondary mb-4">{{ product.description }}</p>
+
+      <!-- Suitability Badges -->
+      <div class="mb-4">
+        <h6 class="fw-bold small text-muted text-uppercase mb-2">Formulation &amp; Suitability Tags:</h6>
+        <div class="d-flex flex-wrap gap-1">
+          {% for tag in product.suitability_tags.all %}
+            <span class="badge bg-light text-dark border p-2">{{ tag.name }}</span>
+          {% empty %}
+            <span class="badge bg-light text-dark border p-2">CGM Friendly</span>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- Add to Cart Form -->
+      <div class="card p-3 border-0 bg-light rounded-3 mb-4">
+        <form action="{% url 'orders:add_to_cart' %}" method="POST" class="row g-3 align-items-center">
+          {% csrf_token %}
+          <input type="hidden" name="product_id" value="{{ product.id }}">
+          
+          <div class="col-auto">
+            <label for="quantityInput" class="col-form-label small fw-bold">Quantity:</label>
+          </div>
+          <div class="col-auto" style="width: 100px;">
+            <input type="number" id="quantityInput" name="quantity" class="form-control" value="1" min="1" max="{{ product.stock }}">
+          </div>
+          <div class="col">
+            {% if product.stock > 0 %}
+              <button type="submit" class="btn btn-curlique w-100 rounded-pill py-2">
+                <i class="bi bi-cart-plus me-1"></i> Add to Cart (NPR {{ product.price|floatformat:0 }})
+              </button>
+            {% else %}
+              <button type="button" class="btn btn-secondary w-100 rounded-pill py-2" disabled>
+                Out of Stock
+              </button>
+            {% endif %}
+          </div>
+        </form>
+      </div>
+
+      <!-- Nepal Delivery & Availability Notice -->
+      <div class="p-3 bg-white border rounded-3 small text-muted d-flex flex-column gap-1">
+        <div class="text-dark fw-bold"><i class="bi bi-truck text-success me-1"></i> Nepal Delivery Guarantee:</div>
+        <div>&bull; Kathmandu Valley (Kathmandu, Lalitpur, Bhaktapur): <strong>24–48 Hours</strong> (NPR 100)</div>
+        <div>&bull; Outside Valley Courier (Pokhara, Chitwan, Butwal, etc.): <strong>2–4 Days</strong> (NPR 180)</div>
+        <div>&bull; Payment Accepted: <strong>Cash on Delivery (COD)</strong> or <strong>eSewa Sandbox (Test Payment)</strong></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Automated Profile Compatibility Spotlight (Feature F) -->
+  <section class="card card-curlique p-4 mb-5 bg-white shadow-sm">
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-3">
+      <div>
+        <span class="badge bg-primary text-uppercase px-2 py-1 mb-1">Scientific Compatibility</span>
+        <h4 class="fw-bold text-dark mb-0">Is This Suitable For Your Curls?</h4>
+      </div>
+      {% if not user_profile %}
+        <a href="{% url 'quizzes:quiz' %}" class="btn btn-sm btn-outline-primary rounded-pill">
+          <i class="bi bi-magic me-1"></i> Take Quiz to Check Compatibility
+        </a>
+      {% endif %}
+    </div>
+
+    {% if compatibility and user_profile %}
+      <div class="row align-items-center g-4 mt-1">
+        <div class="col-md-3 text-center border-end">
+          <div class="compat-ring {{ compatibility.badge_class }} mx-auto mb-2">
+            <span>{{ compatibility.score }}%</span>
+            <small style="font-size: 0.6rem; text-transform: uppercase;">Match</small>
+          </div>
+          <span class="badge bg-{{ compatibility.badge_class }} text-uppercase">{{ compatibility.verdict }}</span>
+          <div class="small text-muted mt-2">Tested against {{ user_profile.curl_type }} {{ user_profile.get_porosity_display|slice:":13" }} hair</div>
+        </div>
+
+        <div class="col-md-9">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <h6 class="fw-bold text-success small text-uppercase mb-2"><i class="bi bi-check-circle me-1"></i> Compatible Aspects</h6>
+              <ul class="list-unstyled small text-secondary d-flex flex-column gap-1 mb-0">
+                {% for pos in compatibility.positives %}
+                  <li><i class="bi bi-check text-success fs-6"></i> {{ pos }}</li>
+                {% endfor %}
+              </ul>
+            </div>
+            <div class="col-md-6">
+              <h6 class="fw-bold text-warning small text-uppercase mb-2"><i class="bi bi-exclamation-triangle me-1"></i> Cautions</h6>
+              <ul class="list-unstyled small text-secondary d-flex flex-column gap-1 mb-0">
+                {% for caut in compatibility.cautions %}
+                  <li><i class="bi bi-exclamation-circle text-warning fs-6"></i> {{ caut }}</li>
+                {% empty %}
+                  <li class="text-success"><i class="bi bi-check2-all"></i> Perfectly safe for your strand thickness and porosity!</li>
+                {% endfor %}
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    {% else %}
+      <div class="p-3 bg-light rounded-3 text-center text-muted small">
+        <i class="bi bi-info-circle me-1"></i> Complete your free 2-minute <a href="{% url 'quizzes:quiz' %}" class="fw-bold text-dark">Curl Profile Quiz</a> to view real-time ingredient compatibility scores for this product.
+      </div>
+    {% endif %}
+  </section>
+
+  <!-- Full Ingredients and How To Use -->
+  <section class="row g-4 mb-5">
+    <div class="col-md-6">
+      <div class="card h-100 card-curlique p-4 bg-white">
+        <h5 class="fw-bold text-dark mb-3"><i class="bi bi-card-text text-primary me-2"></i> How to Apply on Curls</h5>
+        <p class="text-secondary small mb-0" style="white-space: pre-line;">{{ product.usage_instructions|default:"Apply on damp or soaking wet hair. Section curls into 4 parts, rake product evenly from mid-lengths to ends, and scrunch upwards to encourage curl clumping." }}</p>
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <div class="card h-100 card-curlique p-4 bg-white">
+        <h5 class="fw-bold text-dark mb-3"><i class="bi bi-list-columns-reverse text-success me-2"></i> Ingredients Breakdown</h5>
+        <div class="p-3 bg-light rounded-3 font-monospace small text-muted" style="font-size: 0.8rem; line-height: 1.4;">
+          {{ product.ingredients_list }}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Related Products in Category -->
+  {% if related_products %}
+    <section class="mb-5">
+      <h4 class="fw-bold text-dark mb-3">More in {{ product.category.name }}</h4>
+      <div class="row g-4">
+        {% for rel in related_products %}
+          <div class="col-md-4 col-sm-6">
+            <div class="card h-100 card-curlique p-3 d-flex flex-column bg-white">
+              <span class="small text-muted fw-bold text-uppercase">{{ rel.brand }}</span>
+              <h6 class="fw-bold mb-1">
+                <a href="{% url 'shop:product_detail' slug=rel.slug %}" class="text-dark text-decoration-none">{{ rel.name }}</a>
+              </h6>
+              <div class="price-npr my-2">NPR {{ rel.price|floatformat:0 }}</div>
+              <a href="{% url 'shop:product_detail' slug=rel.slug %}" class="btn btn-sm btn-outline-dark rounded-pill mt-auto">View Product</a>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    </section>
+  {% endif %}
+
+</div>
+{% endblock %}
